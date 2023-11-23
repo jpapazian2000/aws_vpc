@@ -13,9 +13,9 @@ provider "aws" {
   region = var.aws_region
 }
 
-locals {
-  availability_zones = ["${var.aws_region}a", "${var.aws_region}b"]
-}
+#locals {
+ # availability_zones = ["${var.aws_region}a", "${var.aws_region}b"]
+#}
 
 # VPC
 resource "aws_vpc" "vpc" {
@@ -35,11 +35,11 @@ resource "aws_subnet" "public_subnet" {
   #count                   = length(var.public_subnets_cidr)
   #cidr_block              = element(var.public_subnets_cidr, count.index)
   cidr_block              = var.public_subnets_cidr
-  availability_zone       = element(local.availability_zones, count.index)
+  availability_zone       = "${var.aws_region}a"
   map_public_ip_on_launch = true
 
   tags = {
-    Name        = "${var.environment}-${element(local.availability_zones, count.index)}-public-subnet"
+    Name        = "${var.environment}-${var.aws_region}a}-public-subnet"
     Environment = "${var.environment}"
   }
 }
@@ -50,11 +50,12 @@ resource "aws_subnet" "private_subnet" {
   #count                   = length(var.private_subnets_cidr)
   #cidr_block              = element(var.private_subnets_cidr, count.index)
   cidr_block              = var.private_subnets_cidr
-  availability_zone       = element(local.availability_zones, count.index)
+  #availability_zone       = element(local.availability_zones, count.index)
+  availability_zone       = "${var.aws_region}a"
   map_public_ip_on_launch = false
 
   tags = {
-    Name        = "${var.environment}-${element(local.availability_zones, count.index)}-private-subnet"
+    Name        = "${var.environment}-${var.aws_region}a}-private-subnet"
     Environment = "${var.environment}"
   }
 }
