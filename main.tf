@@ -17,71 +17,71 @@ provider "aws" {
  # availability_zones = ["${var.aws_region}a", "${var.aws_region}b"]
 #}
 
-locals {
-  vpcs_to_log = [
-    aws_vpc.vpc.id,
-    data.aws_vpc.default.id
-    ]
-  }
+#locals {
+#  vpcs_to_log = [
+#    aws_vpc.vpc.id,
+#    data.aws_vpc.default.id
+#    ]
+#  }
 
 # CloudWatch Log Group
-resource "aws_cloudwatch_log_group" "vpc_logs" {
-  name              = "/vpc/flow-logs"
-  retention_in_days = 14
-}
+#resource "aws_cloudwatch_log_group" "vpc_logs" {
+#  name              = "/vpc/flow-logs"
+#  retention_in_days = 14
+#}
 
 # IAM Role for VPC Flow Logs
-resource "aws_iam_role" "vpc_flow_logs_role" {
-  name = "vpc-flow-logs-role"
+#resource "aws_iam_role" "vpc_flow_logs_role" {
+#  name = "vpc-flow-logs-role"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Action    = "sts:AssumeRole",
-      Effect    = "Allow",
-      Principal = {
-        Service = "vpc-flow-logs.amazonaws.com"
-      }
-    }]
-  })
-}
+#  assume_role_policy = jsonencode({
+#    Version = "2012-10-17",
+#    Statement = [{
+#      Action    = "sts:AssumeRole",
+#      Effect    = "Allow",
+#      Principal = {
+#        Service = "vpc-flow-logs.amazonaws.com"
+#      }
+#    }]
+#  })
+#}
 
 # IAM Policy Attachment
-resource "aws_iam_role_policy" "vpc_flow_logs_policy" {
-  name = "vpc-flow-logs-policy"
-  role = aws_iam_role.vpc_flow_logs_role.id
+#resource "aws_iam_role_policy" "vpc_flow_logs_policy" {
+#  name = "vpc-flow-logs-policy"
+#  role = aws_iam_role.vpc_flow_logs_role.id
 
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Effect   = "Allow",
-      Action   = [
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
-      Resource = "*"
-    }]
-  })
-}
+#  policy = jsonencode({
+#    Version = "2012-10-17",
+#    Statement = [{
+#      Effect   = "Allow",
+#      Action   = [
+#        "logs:CreateLogStream",
+#        "logs:PutLogEvents"
+#      ],
+#      Resource = "*"
+#    }]
+#  })
+#}
 
 # VPC Flow Log (replace with your VPC ID) //COMMENT AND UNCOMMENT THIS PART ONLY
-resource "aws_flow_log" "vpc_flow" {
-  for_each             = toset(local.vpcs_to_log)
+#resource "aws_flow_log" "vpc_flow" {
+#  for_each             = toset(local.vpcs_to_log)
 
-  log_destination_type = "cloud-watch-logs"
+#  log_destination_type = "cloud-watch-logs"
   #log_group_name       = aws_cloudwatch_log_group.vpc_logs.name
-  log_destination       = aws_cloudwatch_log_group.vpc_logs.arn
-  iam_role_arn         = aws_iam_role.vpc_flow_logs_role.arn
-  traffic_type         = "ALL"
+#  log_destination       = aws_cloudwatch_log_group.vpc_logs.arn
+#  iam_role_arn         = aws_iam_role.vpc_flow_logs_role.arn
+#  traffic_type         = "ALL"
   #vpc_id               = var.vpc_id
-  vpc_id               = each.key
-}
+#  vpc_id               = each.key
+#}
 
 
 # VPC
-data "aws_vpc" "default" {
-  default = true
-}
+#data "aws_vpc" "default" {
+#  default = true
+#}
 
 resource "aws_vpc" "vpc" {
   cidr_block           = var.vpc_cidr
@@ -90,7 +90,7 @@ resource "aws_vpc" "vpc" {
 
   tags = {
     Name        = "${var.environment}-vpc"
-    Environment = var.environment
+    #Environment = var.environment
   }
 }
 
