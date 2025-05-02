@@ -16,6 +16,14 @@ provider "aws" {
 #locals {
  # availability_zones = ["${var.aws_region}a", "${var.aws_region}b"]
 #}
+
+locals {
+  vpcs_to_log = [
+    aws_vpc.vpc.id,
+    data.aws_vpc.default.id
+    ]
+  }
+
 # CloudWatch Log Group
 resource "aws_cloudwatch_log_group" "vpc_logs" {
   name              = "/vpc/flow-logs"
@@ -58,16 +66,23 @@ resource "aws_iam_role_policy" "vpc_flow_logs_policy" {
 
 # VPC Flow Log (replace with your VPC ID) //COMMENT AND UNCOMMENT THIS PART ONLY
 resource "aws_flow_log" "vpc_flow" {
+  for_each             = toset(local.vpcs_to_log)
+
   log_destination_type = "cloud-watch-logs"
-  log_group_name       = aws_cloudwatch_log_group.vpc_logs.name
+  #log_group_name       = aws_cloudwatch_log_group.vpc_logs.name
+  log_destination       = aws_cloudwatch_log_group.vpc_logs.arn
   iam_role_arn         = aws_iam_role.vpc_flow_logs_role.arn
   traffic_type         = "ALL"
   #vpc_id               = var.vpc_id
-  vpc_id               = aws_vpc.vpc.id
+  vpc_id               = each.key
 }
 
 
 # VPC
+data "aws_vpc" "default" {
+  default = true
+}
+
 resource "aws_vpc" "vpc" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
